@@ -7,6 +7,7 @@ class Board extends React.Component {
     super(props);
     this.state = {
       game: new Game(),
+      gameStatus: "",
       cells: [["","",""],
       ["","",""],
       ["","",""]],
@@ -30,6 +31,7 @@ class Board extends React.Component {
       updatehumanPiece: async ()=>{
         this.state.clearBoard();
         await this.setState({
+          gameStatus: "",
           humanPiece: this.state.humanPiece==="x" ? "o" : "x",
           computerPiece: this.state.computerPiece==="x" ? "o" : "x"
        });
@@ -48,15 +50,38 @@ class Board extends React.Component {
          await this.setState({
           pieceToPlay: this.state.computerPiece
        });
+       if(this.state.game.any_winner(this.state.cells)===true){
+        await this.setState({
+          gameStatus: "you win"
+        });
+        return;
+      }
        this.state.computerPlay();
        }
      },
      computerPlay: async ()=>{
       let computerMove= this.state.game.select_move(this.state.cells);
+      if(computerMove["available_cells"]===0){
+        await this.setState({
+          gameStatus: "draw"
+       });
+       return;
+      }
       await this.state.updateCells(computerMove['i'],computerMove['j'], this.state.computerPiece)
       await this.setState({
         pieceToPlay: this.state.humanPiece
      });
+     if(this.state.game.any_winner(this.state.cells)===true){
+      await this.setState({
+        gameStatus: "computer wins"
+      });
+      return;
+    }
+     if(computerMove["available_cells"]===1){
+      await this.setState({
+        gameStatus: "draw"
+     });
+     }
      },
      updateCells: async (i,j, piece)=>{
       let newCells = this.state.cloneDeep(this.state.cells);
@@ -71,6 +96,7 @@ class Board extends React.Component {
         await this.state.updateCells(1,1,this.state.computerPiece);
        }
        await this.setState({
+        gameStatus: "playing",
         hoverCells: true,
         pieceToPlay: this.state.humanPiece
      });
@@ -120,6 +146,9 @@ class Board extends React.Component {
                 }
               )
             }
+          </div>
+          <div>
+            <h1>{this.state.gameStatus}</h1>
           </div>
         </div>
       )

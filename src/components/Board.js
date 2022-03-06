@@ -17,44 +17,60 @@ class Board extends React.Component {
       humanPiece: "x",
       computerPiece: "o",
       pieceToPlay: "",
-      updatehumanPiece: ()=>{
-        let newCells = [["","",""],
-      ["","",""],
-      ["","",""]];
-        this.setState({
-          cells: [...newCells],
+      cloneDeep: (_cells)=>{
+        let newCells=[]
+        _cells.forEach(rows=>{
+          newCells.push([]);
+          rows.forEach(cell=>{
+            newCells.at(-1).push(cell);
+          });
+        });
+        return newCells
+      },
+      updatehumanPiece: async ()=>{
+        this.state.clearBoard();
+        await this.setState({
           humanPiece: this.state.humanPiece==="x" ? "o" : "x",
           computerPiece: this.state.computerPiece==="x" ? "o" : "x"
        });
      },
-     humanPlay: (i, j)=>{
+     clearBoard: async ()=>{
+      let newCells = [["","",""],
+      ["","",""],
+      ["","",""]];
+      await this.setState({
+          cells: newCells
+       });
+     },
+     humanPlay: async (i, j)=>{
        if(this.state.pieceToPlay===this.state.humanPiece && this.state.cells[i][j]===""){
-        this.state.updateCells(i,j, this.state.humanPiece);
-         this.setState({
+        await this.state.updateCells(i,j, this.state.humanPiece);
+         await this.setState({
           pieceToPlay: this.state.computerPiece
        });
        this.state.computerPlay();
        }
      },
-     computerPlay: ()=>{
+     computerPlay: async ()=>{
       let computerMove= this.state.game.select_move(this.state.cells);
-      this.state.updateCells(computerMove['i'],computerMove['j'], this.state.computerPiece)
-      this.setState({
+      await this.state.updateCells(computerMove['i'],computerMove['j'], this.state.computerPiece)
+      await this.setState({
         pieceToPlay: this.state.humanPiece
      });
      },
-     updateCells: (i,j, piece)=>{
-      let newCells = [...this.state.cells];
+     updateCells: async (i,j, piece)=>{
+      let newCells = this.state.cloneDeep(this.state.cells);
       newCells[i][j]=piece;
-      this.setState({
-       pieceToPlay: newCells
+      await this.setState({
+       cells: newCells
     });
      },
-     startGame: ()=>{
+     startGame: async ()=>{
+       await this.state.clearBoard();
        if(this.state.humanPiece==="o"){
-        this.state.updateCells(1,1,this.state.computerPiece);
+        await this.state.updateCells(1,1,this.state.computerPiece);
        }
-       this.setState({
+       await this.setState({
         hoverCells: true,
         pieceToPlay: this.state.humanPiece
      });

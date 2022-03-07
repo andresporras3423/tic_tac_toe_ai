@@ -45,7 +45,7 @@ class Board extends React.Component {
        });
      },
      humanPlay: async (i, j)=>{
-       if(this.state.pieceToPlay===this.state.humanPiece && this.state.cells[i][j]===""){
+       if(this.state.pieceToPlay===this.state.humanPiece && this.state.cells[i][j]==="" && this.state.gameStatus==="playing"){
         await this.state.updateCells(i,j, this.state.humanPiece);
          await this.setState({
           pieceToPlay: this.state.computerPiece

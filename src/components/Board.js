@@ -91,12 +91,15 @@ class Board extends React.Component {
     });
      },
      startGame: async ()=>{
+       await this.setState({
+        game: new Game(this.state.computerPiece, this.state.humanPiece)
+       })
        await this.state.clearBoard();
        if(this.state.humanPiece==="o"){
-        await this.state.updateCells(1,1,this.state.computerPiece);
+        let computerMove= this.state.game.select_move(this.state.cells);
+        await this.state.updateCells(computerMove['i'],computerMove['j'],this.state.computerPiece);
        }
        await this.setState({
-        game: new Game(this.state.computerPiece, this.state.humanPiece),
         gameStatus: "playing",
         hoverCells: true,
         pieceToPlay: this.state.humanPiece

@@ -6,7 +6,7 @@ class Board extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      game: new Game(),
+      game: new Game("",""),
       gameStatus: "",
       cells: [["","",""],
       ["","",""],
@@ -96,6 +96,7 @@ class Board extends React.Component {
         await this.state.updateCells(1,1,this.state.computerPiece);
        }
        await this.setState({
+        game: new Game(this.state.computerPiece, this.state.humanPiece),
         gameStatus: "playing",
         hoverCells: true,
         pieceToPlay: this.state.humanPiece

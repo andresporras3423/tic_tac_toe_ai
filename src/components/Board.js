@@ -147,7 +147,7 @@ class Board extends React.Component {
                           (cell, j)=>{
                             return(
                               <div className={"cell-properties "+(this.state.hoverCells===true ? "hover-cells" : "")} key={nanoid()} onClick={()=>this.state.humanPlay(i,j)}>
-                                <img src={`/assets/${cell}.svg`} height="50px" width="50px" className={cell==="" ? "invisible" : ""} />
+                                <img src={`/assets/${cell}.svg`} height="60px" width="60px" className={cell==="" ? "invisible" : ""} />
                               </div>
                             )
                           }

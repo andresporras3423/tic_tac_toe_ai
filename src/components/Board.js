@@ -51,6 +51,10 @@ class Board extends React.Component {
           pieceToPlay: this.state.computerPiece
        });
        if(this.state.game.any_winner(this.state.cells)===true){
+         const winnerCells = this.state.game.winnerCells(this.state.cells);
+         winnerCells["coords"].forEach(cell=>{
+           this.state.updateCells(cell[0], cell[1], winnerCells[this.state.humanPiece]);
+         });
         await this.setState({
           gameStatus: "you win"
         });
@@ -72,6 +76,10 @@ class Board extends React.Component {
         pieceToPlay: this.state.humanPiece
      });
      if(this.state.game.any_winner(this.state.cells)===true){
+      const winnerCells = this.state.game.winnerCells(this.state.cells);
+      winnerCells["coords"].forEach(cell=>{
+        this.state.updateCells(cell[0], cell[1], winnerCells[this.state.computerPiece]);
+      });
       await this.setState({
         gameStatus: "computer wins"
       });
@@ -139,7 +147,7 @@ class Board extends React.Component {
                           (cell, j)=>{
                             return(
                               <div className={"cell-properties "+(this.state.hoverCells===true ? "hover-cells" : "")} key={nanoid()} onClick={()=>this.state.humanPlay(i,j)}>
-                                <img src={this.state.pieces[cell]} height="40px" width="40px" className={cell==="" ? "invisible" : ""} />
+                                <img src={`/assets/${cell}.svg`} height="50px" width="50px" className={cell==="" ? "invisible" : ""} />
                               </div>
                             )
                           }

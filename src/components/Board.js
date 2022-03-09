@@ -1,6 +1,16 @@
 import React from 'react';
 import { nanoid } from 'nanoid';
 import Game from './../classes/Game';
+import x from '../assets/x.svg';
+import x_row from '../assets/x_row.svg';
+import x_column from '../assets/x_column.svg';
+import x_diagonal1 from '../assets/x_diagonal1.svg';
+import x_diagonal2 from '../assets/x_diagonal2.svg';
+import o from '../assets/o.svg';
+import o_row from '../assets/o_row.svg';
+import o_column from '../assets/o_column.svg';
+import o_diagonal1 from '../assets/o_diagonal1.svg';
+import o_diagonal2 from '../assets/o_diagonal2.svg';
 
 class Board extends React.Component {
   constructor(props) {
@@ -12,8 +22,16 @@ class Board extends React.Component {
       ["","",""],
       ["","",""]],
       hoverCells: false,
-      pieces: {"x": "/assets/x.svg",
-      "o": "/assets/o.svg",
+      pieces: {"x": x,
+      "x_row": x_row,
+      "x_column": x_column,
+      "x_diagonal1": x_diagonal1,
+      "x_diagonal2": x_diagonal2,
+      "o": o,
+      "o_row": o_row,
+      "o_column": o_column,
+      "o_diagonal1": o_diagonal1,
+      "o_diagonal2": o_diagonal2,
       "": ""},
       humanPiece: "x",
       computerPiece: "o",
@@ -147,7 +165,7 @@ class Board extends React.Component {
                           (cell, j)=>{
                             return(
                               <div className={"cell-properties "+(this.state.hoverCells===true ? "hover-cells" : "")} key={nanoid()} onClick={()=>this.state.humanPlay(i,j)}>
-                                <img src={`/assets/${cell}.svg`} height="60px" width="60px" className={cell==="" ? "invisible" : ""} />
+                                <img alt="" src={this.state.pieces[cell]} height="60px" width="60px" className={cell==="" ? "invisible" : ""} />
                               </div>
                             )
                           }

@@ -1,4 +1,4 @@
-# MY-PORTFOLIO
+# TIC-TAC-TOE-AI
 
 ![screenshot](screenshot.png)
 

@@ -5,7 +5,7 @@
 # What it does
 
 - A simple tic tac toe game to play against the computer
-- It finds best moves using a minimax algorithm, so good luck trying to beat it
+- It finds best moves using a minimax algorithm, so good luck trying to win
 
 ## Built With
 

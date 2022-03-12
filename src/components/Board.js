@@ -139,13 +139,13 @@ class Board extends React.Component {
         <div className="boardContent">
           <div className="form-check">
             <div>
-            <input type="radio" value="white" name="color" className="form-check-input"
+            <input data-testid="radio-x" type="radio" value="x" name="piece" className="form-check-input"
             checked={this.state.humanPiece === "x"}
               onChange={this.state.updatehumanPiece} /> 
               <label className="form-check-label">Play with X</label>
             </div>
             <div>
-            <input type="radio" value="black" name="color" className="form-check-input"
+            <input data-testid="radio-o" type="radio" value="o" name="piece" className="form-check-input"
             checked={this.state.humanPiece === "o"}
             onChange={this.state.updatehumanPiece}  /> 
             <label className="form-check-label">Play with O</label>

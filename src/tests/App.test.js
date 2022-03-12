@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import { render } from '@testing-library/react';
+import { render, within } from '@testing-library/react';
 import App from '../components/App';
 
 test('check if page has a start text', () => {
@@ -24,4 +24,9 @@ test('test radio button is checked', () => {
   const component = render(<App />);
   const piece = component.getByTestId("radio-o");
   expect(piece).not.toBeChecked();
+});
+test('check that div board has 9 images', () => {
+  const component = render(<App />);
+  const images = component.container.querySelectorAll('img');
+  expect(images.length).toBe(9);
 });

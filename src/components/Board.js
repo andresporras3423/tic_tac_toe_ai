@@ -159,7 +159,7 @@ class Board extends React.Component {
               this.state.cells.map(
                 (row, i)=>{
                   return(
-                    <div className="rowBoard" key={nanoid()}>
+                    <div data-testid="div-board" className="rowBoard" key={nanoid()}>
                       {
                         row.map(
                           (cell, j)=>{

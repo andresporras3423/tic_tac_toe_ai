@@ -22,7 +22,7 @@ class Board extends React.Component {
       ["","",""],
       ["","",""]],
       hoverCells: false,
-      pieces: {"x": x,
+      symbols: {"x": x,
       "x_row": x_row,
       "x_column": x_column,
       "x_diagonal1": x_diagonal1,
@@ -33,9 +33,9 @@ class Board extends React.Component {
       "o_diagonal1": o_diagonal1,
       "o_diagonal2": o_diagonal2,
       "": ""},
-      humanPiece: "x",
-      computerPiece: "o",
-      pieceToPlay: "",
+      humanSymbol: "x",
+      computerSymbol: "o",
+      symbolToPlay: "",
       cloneDeep: (_cells)=>{
         let newCells=[]
         _cells.forEach(rows=>{
@@ -46,12 +46,12 @@ class Board extends React.Component {
         });
         return newCells
       },
-      updatehumanPiece: async ()=>{
+      updatehumanSymbol: async ()=>{
         this.state.clearBoard();
         await this.setState({
           gameStatus: "",
-          humanPiece: this.state.humanPiece==="x" ? "o" : "x",
-          computerPiece: this.state.computerPiece==="x" ? "o" : "x"
+          humanSymbol: this.state.humanSymbol==="x" ? "o" : "x",
+          computerSymbol: this.state.computerSymbol==="x" ? "o" : "x"
        });
      },
      clearBoard: async ()=>{
@@ -63,15 +63,15 @@ class Board extends React.Component {
        });
      },
      humanPlay: async (i, j)=>{
-       if(this.state.pieceToPlay===this.state.humanPiece && this.state.cells[i][j]==="" && this.state.gameStatus==="playing"){
-        await this.state.updateCells(i,j, this.state.humanPiece);
+       if(this.state.symbolToPlay===this.state.humanSymbol && this.state.cells[i][j]==="" && this.state.gameStatus==="playing"){
+        await this.state.updateCells(i,j, this.state.humanSymbol);
          await this.setState({
-          pieceToPlay: this.state.computerPiece
+          symbolToPlay: this.state.computerSymbol
        });
        if(this.state.game.any_winner(this.state.cells)===true){
          const winnerCells = this.state.game.winnerCells(this.state.cells);
          winnerCells["coords"].forEach(cell=>{
-           this.state.updateCells(cell[0], cell[1], winnerCells[this.state.humanPiece]);
+           this.state.updateCells(cell[0], cell[1], winnerCells[this.state.humanSymbol]);
          });
         await this.setState({
           gameStatus: "you win"
@@ -89,14 +89,14 @@ class Board extends React.Component {
        });
        return;
       }
-      await this.state.updateCells(computerMove['i'],computerMove['j'], this.state.computerPiece)
+      await this.state.updateCells(computerMove['i'],computerMove['j'], this.state.computerSymbol)
       await this.setState({
-        pieceToPlay: this.state.humanPiece
+        symbolToPlay: this.state.humanSymbol
      });
      if(this.state.game.any_winner(this.state.cells)===true){
       const winnerCells = this.state.game.winnerCells(this.state.cells);
       winnerCells["coords"].forEach(cell=>{
-        this.state.updateCells(cell[0], cell[1], winnerCells[this.state.computerPiece]);
+        this.state.updateCells(cell[0], cell[1], winnerCells[this.state.computerSymbol]);
       });
       await this.setState({
         gameStatus: "computer wins"
@@ -109,26 +109,26 @@ class Board extends React.Component {
      });
      }
      },
-     updateCells: async (i,j, piece)=>{
+     updateCells: async (i,j, symbol)=>{
       let newCells = this.state.cloneDeep(this.state.cells);
-      newCells[i][j]=piece;
+      newCells[i][j]=symbol;
       await this.setState({
        cells: newCells
     });
      },
      startGame: async ()=>{
        await this.setState({
-        game: new Game(this.state.computerPiece, this.state.humanPiece)
+        game: new Game(this.state.computerSymbol, this.state.humanSymbol)
        })
        await this.state.clearBoard();
-       if(this.state.humanPiece==="o"){
+       if(this.state.humanSymbol==="o"){
         let computerMove= this.state.game.select_move(this.state.cells);
-        await this.state.updateCells(computerMove['i'],computerMove['j'],this.state.computerPiece);
+        await this.state.updateCells(computerMove['i'],computerMove['j'],this.state.computerSymbol);
        }
        await this.setState({
         gameStatus: "playing",
         hoverCells: true,
-        pieceToPlay: this.state.humanPiece
+        symbolToPlay: this.state.humanSymbol
      });
      }
     };
@@ -139,15 +139,15 @@ class Board extends React.Component {
         <div className="boardContent">
           <div className="form-check">
             <div>
-            <input data-testid="radio-x" type="radio" value="x" name="piece" className="form-check-input"
-            checked={this.state.humanPiece === "x"}
-              onChange={this.state.updatehumanPiece} /> 
+            <input data-testid="radio-x" type="radio" value="x" name="symbol" className="form-check-input"
+            checked={this.state.humanSymbol === "x"}
+              onChange={this.state.updatehumanSymbol} /> 
               <label className="form-check-label">Play with X</label>
             </div>
             <div>
-            <input data-testid="radio-o" type="radio" value="o" name="piece" className="form-check-input"
-            checked={this.state.humanPiece === "o"}
-            onChange={this.state.updatehumanPiece}  /> 
+            <input data-testid="radio-o" type="radio" value="o" name="symbol" className="form-check-input"
+            checked={this.state.humanSymbol === "o"}
+            onChange={this.state.updatehumanSymbol}  /> 
             <label className="form-check-label">Play with O</label>
             </div>
           </div>
@@ -165,7 +165,7 @@ class Board extends React.Component {
                           (cell, j)=>{
                             return(
                               <div className={"cell-properties "+(this.state.hoverCells===true ? "hover-cells" : "")} key={nanoid()} onClick={()=>this.state.humanPlay(i,j)}>
-                                <img alt="" src={this.state.pieces[cell]} height="60px" width="60px" className={cell==="" ? "invisible" : ""} />
+                                <img alt="" src={this.state.symbols[cell]} height="60px" width="60px" className={cell==="" ? "invisible" : ""} />
                               </div>
                             )
                           }

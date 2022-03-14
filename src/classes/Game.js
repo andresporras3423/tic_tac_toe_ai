@@ -1,7 +1,7 @@
 class Game{
-  constructor(computerPiece, humanPiece){
-    this.computerPiece = computerPiece;
-    this.humanPiece = humanPiece;
+  constructor(computerSymbol, humanSymbol){
+    this.computerSymbol = computerSymbol;
+    this.humanSymbol = humanSymbol;
     this.sols= [{"coords": [[0,0],[0,1],[0,2]], "x": "x_row", "o": "o_row"},
     {"coords": [[1,0],[1,1],[1,2]], "x": "x_row", "o": "o_row"},
     {"coords": [[2,0],[2,1],[2,2]], "x": "x_row", "o": "o_row"},
@@ -72,7 +72,7 @@ class Game{
     const available_moves = this.available_moves(position);
     let best_score=maxPlayer ? -200 : 200;
     available_moves.forEach((move)=>{
-      const new_pos = this.positionAfterMove(position, move, maxPlayer ? this.computerPiece : this.humanPiece);
+      const new_pos = this.positionAfterMove(position, move, maxPlayer ? this.computerSymbol : this.humanSymbol);
       const new_score =this.minimax(new_pos, depth-1, !maxPlayer);
       if(maxPlayer && best_score<new_score) best_score=new_score;
       else if(!maxPlayer && best_score>new_score) best_score=new_score;
@@ -85,7 +85,7 @@ class Game{
     let best_score = -200;
     let best_moves = [];
     available_moves.forEach((move)=>{
-      const new_pos = this.positionAfterMove(position, move, this.computerPiece);
+      const new_pos = this.positionAfterMove(position, move, this.computerSymbol);
       const new_score =this.minimax(new_pos, depth-1, false);
       if(best_score<new_score){
         best_score=new_score;
@@ -96,9 +96,9 @@ class Game{
     return best_moves[Math.floor(Math.random()*best_moves.length)];
   }
   
-  positionAfterMove= (position, move, piece)=>{
+  positionAfterMove= (position, move, symbol)=>{
     let new_pos = this.deepClone(position);
-    new_pos[move["i"]][move["j"]]= piece;
+    new_pos[move["i"]][move["j"]]= symbol;
     return new_pos;
   }
   

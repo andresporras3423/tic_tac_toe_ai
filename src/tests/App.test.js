@@ -37,10 +37,28 @@ test('check all source images are empty after player start a game with default c
   const images = component.container.querySelectorAll('img[src=""]');
   expect(images.length).toBe(9);
 });
-test('check all source images expect one are empty after player start a game using x symbol', () => {
+test('radiobutton "o" is checked after user clicked', () => {
+  const component = render(<App />);
+  const symbol = component.getByTestId("radio-o");
+  fireEvent.click(symbol);
+  expect(symbol).toBeChecked();
+});
+test('radiobutton "x" is checked after user clicked "o" and then "x"', () => {
+  const component = render(<App />);
+  const symbol_o = component.getByTestId("radio-o");
+  const symbol_x = component.getByTestId("radio-x");
+  fireEvent.click(symbol_o);
+  fireEvent.click(symbol_x);
+  expect(symbol_x).toBeChecked();
+});
+test('check all source images expect one are empty after player start a game using x symbol', async () => {
   const component = render(<App />);
   const button = component.getByText(/start/i);
+  const symbol = component.getByTestId("radio-o");
+  fireEvent.click(symbol);
   fireEvent.click(button);
-  const images = component.container.querySelectorAll('img[src=""]');
-  expect(images.length).toBe(9);
+  const images = await component.container.querySelectorAll('img[src=""]');
+  setTimeout(() => {
+    expect(images.length).toBe(8);
+  }, 1000);
 });

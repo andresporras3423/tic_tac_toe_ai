@@ -152,7 +152,7 @@ class Board extends React.Component {
             </div>
           </div>
           <div>
-            <button className="btn btn-primary" onClick={this.state.startGame}>start</button>
+            <button data-testid="button-start" className="btn btn-primary" onClick={this.state.startGame}>start</button>
           </div>
           <div className="board">
             {

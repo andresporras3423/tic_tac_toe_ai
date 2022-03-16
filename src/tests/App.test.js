@@ -57,50 +57,103 @@ test('check all source images expect one are empty after player start a game usi
   const symbol = component.getByTestId("radio-o");
   fireEvent.click(symbol);
   fireEvent.click(button);
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 1000));
   const images = component.container.querySelectorAll('img[src=""]');
   expect(images.length).toBe(8);
-});
+}, 10000);
 test('if computer start playing, after user makes its first move there are only 6 cells with no image', async () => {
   const component = render(<App />);
   const button = component.getByTestId("button-start");
   const symbol = component.getByTestId("radio-o");
   fireEvent.click(symbol);
   fireEvent.click(button);
-  await new Promise((r) => setTimeout(r, 2000));
-  const images = component.container.querySelectorAll('.cell-properties');
+  await new Promise((r) => setTimeout(r, 1000));
+  const images = component.container.querySelectorAll('.cell-properties img[src=""]');
   const image1 = images[Math.floor(Math.random()*images.length)];
   fireEvent.click(image1);
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 1000));
   const n_images = component.container.querySelectorAll('img[src=""]');
   expect(n_images.length).toBe(6);
-});
+}, 10000);
 test('after user click on start, content "playing" appear in the screen', async () => {
   const component = render(<App />);
   const button = component.getByTestId("button-start");
   fireEvent.click(button);
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 1000));
   expect(component.getByText("playing")).toBeInTheDocument();
-});
+}, 10000);
 test('if human start playing, after user makes its first move there are only 7 cells with no image', async () => {
   const component = render(<App />);
   const button = component.getByText(/start/i);
   fireEvent.click(button);
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 1000));
   const divs = component.container.querySelectorAll('.cell-properties img[src=""]');
   const div1 = divs[Math.floor(Math.random()*divs.length)];
   fireEvent.click(div1);
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 1000));
   const n_images = component.container.querySelectorAll('img[src=""]');
   expect(n_images.length).toBe(7)
-});
-test('check there is only one image with scr=x.svg after game start', async () => {
+}, 10000);
+test('check there is only one image with scr=x.svg after user check o symbol and click start', async () => {
   const component = render(<App />);
   const button = component.getByText(/start/i);
   const symbol = component.getByTestId("radio-o");
   fireEvent.click(symbol);
   fireEvent.click(button);
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 1000));
   const images = component.container.querySelectorAll('img[src="x.svg"]');
   expect(images.length).toBe(1);
-});
+}, 10000);
+test('check there is only one image with scr=x.svg after game start and click one available cell', async () => {
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 1000));
+  const divs = component.container.querySelectorAll('.cell-properties img[src=""]');
+  const div1 = divs[Math.floor(Math.random()*divs.length)];
+  fireEvent.click(div1);
+  await new Promise((r) => setTimeout(r, 1000));
+  const x_images = component.container.querySelectorAll('img[src="x.svg"]');
+  expect(x_images.length).toBe(1);
+}, 10000);
+test('check there are two images with  scr=x.svg after user chooses o symbol, game start and  user clicks one available cell', async () => {
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  const symbol = component.getByTestId("radio-o");
+  fireEvent.click(symbol);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 1000));
+  const divs = component.container.querySelectorAll('.cell-properties img[src=""]');
+  const div1 = divs[Math.floor(Math.random()*divs.length)];
+  fireEvent.click(div1);
+  await new Promise((r) => setTimeout(r, 1000));
+  const x_images = component.container.querySelectorAll('img[src="x.svg"]');
+  expect(x_images.length).toBe(2);
+}, 10000);
+test('user play with default configuration and it clicks the four cells that are not corners neither the center, after that computer should have won', async () => {
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  fireEvent.click(button);
+  const items =["img-0-1","img-1-0","img-1-2","img-2-1"]
+  for(let i=0; i<4; i++){
+    const cell = component.getByTestId(items[i]);
+    fireEvent.click(cell);
+    await new Promise((r) => setTimeout(r, 1500));
+  }
+  expect(component.getByText("computer wins")).toBeInTheDocument();
+}, 10000);
+test('user click 0-radio  and it clicks the four cells that are not corners neither the center, after that computer should have won', async () => {
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  const symbol = component.getByTestId("radio-o");
+  fireEvent.click(symbol);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 1500));
+  const items =["img-0-1","img-1-0","img-1-2","img-2-1"]
+  for(let i=0; i<4; i++){
+    const cell = component.getByTestId(items[i]);
+    fireEvent.click(cell);
+    await new Promise((r) => setTimeout(r, 1500));
+  }
+  expect(component.getByText("computer wins")).toBeInTheDocument();
+}, 10000);

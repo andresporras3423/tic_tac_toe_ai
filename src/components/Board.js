@@ -164,7 +164,7 @@ class Board extends React.Component {
                         row.map(
                           (cell, j)=>{
                             return(
-                              <div className={"cell-properties "+(this.state.hoverCells===true ? "hover-cells" : "")} key={nanoid()} onClick={()=>this.state.humanPlay(i,j)}>
+                              <div data-testid={`img-${i}-${j}`} className={"cell-properties "+(this.state.hoverCells===true ? "hover-cells" : "")} key={nanoid()} onClick={()=>this.state.humanPlay(i,j)}>
                                 <img alt="" src={this.state.symbols[cell]} height="60px" width="60px" className={cell==="" ? "invisible" : ""} />
                               </div>
                             )

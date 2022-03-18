@@ -2,7 +2,33 @@ import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import { render, fireEvent, prettyDOM } from '@testing-library/react';
 import App from '../components/App';
-
+const check_valid_solution = (images, image_name)=>{
+  console.log(`image 0: ${images["0"].getAttribute('data-testid')}`);
+  console.log(`image 1: ${images["1"].getAttribute('data-testid')}`);
+  console.log(`image 2: ${images["2"].getAttribute('data-testid')}`);
+  console.log(`image_name: ${image_name}`);
+  if(image_name==="x_diagonal1" || image_name==="o_diagonal1"){
+    if(images["0"].getAttribute('data-testid')==="img-0-0" && images["1"].getAttribute('data-testid')==="img-1-1" && images["2"].getAttribute('data-testid')==="img-2-2") return true;
+    return false;
+  }
+  if(image_name==="x_diagonal2" || image_name==="o_diagonal2"){
+    if(images["0"].getAttribute('data-testid')==="img-0-2" && images["1"].getAttribute('data-testid')==="img-1-1" && images["2"].getAttribute('data-testid')==="img-2-0") return true;
+    return false;
+  }
+  if(image_name==="x_row" || image_name==="o_row"){
+    if(images["0"].getAttribute('data-testid')==="img-0-0" && images["1"].getAttribute('data-testid')==="img-0-1" && images["2"].getAttribute('data-testid')==="img-0-2") return true;
+    if(images["0"].getAttribute('data-testid')==="img-1-0" && images["1"].getAttribute('data-testid')==="img-1-1" && images["2"].getAttribute('data-testid')==="img-1-2") return true;
+    if(images["0"].getAttribute('data-testid')==="img-2-0" && images["1"].getAttribute('data-testid')==="img-2-1" && images["2"].getAttribute('data-testid')==="img-2-2") return true;
+    return false;
+  }
+  if(image_name==="x_column" || image_name==="o_column"){
+    if(images["0"].getAttribute('data-testid')==="img-0-0" && images["1"].getAttribute('data-testid')==="img-1-0" && images["2"].getAttribute('data-testid')==="img-2-0") return true;
+    if(images["0"].getAttribute('data-testid')==="img-0-1" && images["1"].getAttribute('data-testid')==="img-1-1" && images["2"].getAttribute('data-testid')==="img-2-1") return true;
+    if(images["0"].getAttribute('data-testid')==="img-0-2" && images["1"].getAttribute('data-testid')==="img-1-2" && images["2"].getAttribute('data-testid')==="img-2-2") return true;
+    return false;
+  }
+  return false;
+};
 test('check if page has a start text', () => {
   const component = render(<App />);
   expect(component.getByText(/start/i)).toBeInTheDocument();
@@ -122,7 +148,7 @@ test('check there are two images with  scr=x.svg after user chooses o symbol, ga
   const symbol = component.getByTestId("radio-o");
   fireEvent.click(symbol);
   fireEvent.click(button);
-  await new Promise((r) => setTimeout(r, 1000));
+  await new Promise((r) => setTimeout(r, 2000));
   const divs = component.container.querySelectorAll('.cell-properties img[src=""]');
   const div1 = divs[Math.floor(Math.random()*divs.length)];
   fireEvent.click(div1);
@@ -134,11 +160,11 @@ test('user play with default configuration and it clicks the four cells that are
   const component = render(<App />);
   const button = component.getByText(/start/i);
   fireEvent.click(button);
-  const items =["img-0-1","img-1-0","img-1-2","img-2-1"]
+  const items =["div-0-1","div-1-0","div-1-2","div-2-1"]
   for(let i=0; i<4; i++){
     const cell = component.getByTestId(items[i]);
     fireEvent.click(cell);
-    await new Promise((r) => setTimeout(r, 1500));
+    await new Promise((r) => setTimeout(r, 2000 - (i*500)));
   }
   expect(component.getByText("computer wins")).toBeInTheDocument();
 }, 10000);
@@ -148,12 +174,50 @@ test('user click 0-radio  and it clicks the four cells that are not corners neit
   const symbol = component.getByTestId("radio-o");
   fireEvent.click(symbol);
   fireEvent.click(button);
-  await new Promise((r) => setTimeout(r, 1500));
-  const items =["img-0-1","img-1-0","img-1-2","img-2-1"]
+  await new Promise((r) => setTimeout(r, 2000));
+  const items =["div-0-1","div-1-0","div-1-2","div-2-1"]
   for(let i=0; i<4; i++){
     const cell = component.getByTestId(items[i]);
     fireEvent.click(cell);
-    await new Promise((r) => setTimeout(r, 1500));
+    await new Promise((r) => setTimeout(r,2000 - (i*500)));
   }
   expect(component.getByText("computer wins")).toBeInTheDocument();
+}, 10000);
+// test('user play with default configuration and it plays in a way computer wins, this tests check the boards shows one of the possible solutions', async () => {
+//   const component = render(<App />);
+//   const button = component.getByText(/start/i);
+//   fireEvent.click(button);
+//   const items =["div-0-1","div-1-0","div-1-2","div-2-1"]
+//   for(let i=0; i<4; i++){
+//     const cell = component.getByTestId(items[i]);
+//     fireEvent.click(cell);
+//     await new Promise((r) => setTimeout(r, 2000 - (i*500)));
+//   };
+//   const solutions=["o_diagonal1","o_diagonal2","o_row","o_column"].map(image_name=>{
+//     const images = component.container.querySelectorAll(`img[src="${image_name}.svg"]`);
+//     console.log(`length: ${images.length}`);
+//     if(images.length===3) return check_valid_solution(images, image_name);
+//     return false;
+//   });
+//   expect(solutions.some(any=>any)).toBe(true);
+// }, 10000);
+test('user select o symbol to play and it plays in a way computer wins, this tests check the boards shows one of the possible solutions', async () => {
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  const symbol = component.getByTestId("radio-o");
+  fireEvent.click(symbol);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 2000));
+  const items =["div-0-1","div-1-0","div-1-2","div-2-1"]
+  for(let i=0; i<4; i++){
+    const cell = component.getByTestId(items[i]);
+    fireEvent.click(cell);
+    await new Promise((r) => setTimeout(r, 2000 - (i*500)));
+  };
+  const solutions=["x_diagonal1","x_diagonal2","x_row","x_column"].map(image_name=>{
+    const images = component.container.querySelectorAll(`img[src="${image_name}.svg"]`);
+    if(images.length===3) return check_valid_solution(images, image_name);
+    return false;
+  });
+  expect(solutions.some(any=>any)).toBe(true);
 }, 10000);

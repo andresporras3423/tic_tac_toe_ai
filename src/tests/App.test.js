@@ -3,7 +3,6 @@ import '@testing-library/jest-dom/extend-expect';
 import { render, fireEvent, prettyDOM } from '@testing-library/react';
 import App from '../components/App';
 import TestGame from './../classes/TestGame';
-import userEvent from '@testing-library/user-event'
 const cellsId= {
   "img-0-0": {"i": 0, "j": 0},
   "img-0-1": {"i": 0, "j": 1},
@@ -229,7 +228,7 @@ test('user select o symbol to play and it plays in a way computer wins, this tes
     return false;
   });
   expect(solutions.some(any=>any)).toBe(true);
-}, 10000);
+}, 10000)
 test('using default config, show "draw" message after both players do perfect moves', async () => {
   const testGame = new TestGame("x", "o");
   const component = render(<App />);
@@ -238,6 +237,29 @@ test('using default config, show "draw" message after both players do perfect mo
   await new Promise((r) => setTimeout(r, 2000));
   const cells = [["","",""],["","",""],["","",""]];
   for(let i=0; i<5; i++){
+    const images = component.container.querySelectorAll(`img`);
+    images.forEach(image=>{
+      const id = image.getAttribute('data-testid');
+      let src = image.getAttribute('src');
+      cells[cellsId[id]["i"]][cellsId[id]["j"]] =  src==="" ? "" : src.split("")[0];
+    });
+    let nextMove = testGame.select_move(cells);
+    const nextDiv = component.getByTestId(`div-${nextMove["i"]}-${nextMove["j"]}`);
+    fireEvent.click(nextDiv);
+    await new Promise((r) => setTimeout(r, 2000-(250*i)));
+  }
+  expect(component.getByText("draw")).toBeInTheDocument();
+}, 20000);
+test('when human plays with o symbol, show "draw" message after both players do perfect moves', async () => {
+  const testGame = new TestGame("o", "x");
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  const symbol = component.getByTestId("radio-o");
+  fireEvent.click(symbol);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 2000));
+  const cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<4; i++){
     const images = component.container.querySelectorAll(`img`);
     images.forEach(image=>{
       const id = image.getAttribute('data-testid');

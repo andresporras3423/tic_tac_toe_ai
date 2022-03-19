@@ -2,11 +2,20 @@ import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import { render, fireEvent, prettyDOM } from '@testing-library/react';
 import App from '../components/App';
+import TestGame from './../classes/TestGame';
+import userEvent from '@testing-library/user-event'
+const cellsId= {
+  "img-0-0": {"i": 0, "j": 0},
+  "img-0-1": {"i": 0, "j": 1},
+  "img-0-2": {"i": 0, "j": 2},
+  "img-1-0": {"i": 1, "j": 0},
+  "img-1-1": {"i": 1, "j": 1},
+  "img-1-2": {"i": 1, "j": 2},
+  "img-2-0": {"i": 2, "j": 0},
+  "img-2-1": {"i": 2, "j": 1},
+  "img-2-2": {"i": 2, "j": 2},
+};
 const check_valid_solution = (images, image_name)=>{
-  console.log(`image 0: ${images["0"].getAttribute('data-testid')}`);
-  console.log(`image 1: ${images["1"].getAttribute('data-testid')}`);
-  console.log(`image 2: ${images["2"].getAttribute('data-testid')}`);
-  console.log(`image_name: ${image_name}`);
   if(image_name==="x_diagonal1" || image_name==="o_diagonal1"){
     if(images["0"].getAttribute('data-testid')==="img-0-0" && images["1"].getAttribute('data-testid')==="img-1-1" && images["2"].getAttribute('data-testid')==="img-2-2") return true;
     return false;
@@ -156,19 +165,19 @@ test('check there are two images with  scr=x.svg after user chooses o symbol, ga
   const x_images = component.container.querySelectorAll('img[src="x.svg"]');
   expect(x_images.length).toBe(2);
 }, 10000);
-test('user play with default configuration and it clicks the four cells that are not corners neither the center, after that computer should have won', async () => {
-  const component = render(<App />);
-  const button = component.getByText(/start/i);
-  fireEvent.click(button);
-  const items =["div-0-1","div-1-0","div-1-2","div-2-1"]
-  for(let i=0; i<4; i++){
-    const cell = component.getByTestId(items[i]);
-    fireEvent.click(cell);
-    await new Promise((r) => setTimeout(r, 2000 - (i*500)));
-  }
-  expect(component.getByText("computer wins")).toBeInTheDocument();
-}, 10000);
-test('user click 0-radio  and it clicks the four cells that are not corners neither the center, after that computer should have won', async () => {
+// test('user play with default configuration and it clicks the four cells that are not corners neither the center, after that computer should have won', async () => {
+//   const component = render(<App />);
+//   const button = component.getByText(/start/i);
+//   fireEvent.click(button);
+//   const items =["div-0-1","div-1-0","div-1-2","div-2-1"]
+//   for(let i=0; i<4; i++){
+//     const cell = component.getByTestId(items[i]);
+//     fireEvent.click(cell);
+//     await new Promise((r) => setTimeout(r, 2000 - (i*500)));
+//   }
+//   expect(component.getByText("computer wins")).toBeInTheDocument();
+// }, 10000);
+test('user play with o symbol and it clicks the four cells that are not corners neither the center, after that computer should have won', async () => {
   const component = render(<App />);
   const button = component.getByText(/start/i);
   const symbol = component.getByTestId("radio-o");
@@ -179,7 +188,7 @@ test('user click 0-radio  and it clicks the four cells that are not corners neit
   for(let i=0; i<4; i++){
     const cell = component.getByTestId(items[i]);
     fireEvent.click(cell);
-    await new Promise((r) => setTimeout(r,2000 - (i*500)));
+    await new Promise((r) => setTimeout(r,2000 - (i*250)));
   }
   expect(component.getByText("computer wins")).toBeInTheDocument();
 }, 10000);
@@ -221,3 +230,24 @@ test('user select o symbol to play and it plays in a way computer wins, this tes
   });
   expect(solutions.some(any=>any)).toBe(true);
 }, 10000);
+test('using default config, show "draw" message after both players do perfect moves', async () => {
+  const testGame = new TestGame("x", "o");
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 2000));
+  const cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<5; i++){
+    const images = component.container.querySelectorAll(`img`);
+    images.forEach(image=>{
+      const id = image.getAttribute('data-testid');
+      let src = image.getAttribute('src');
+      cells[cellsId[id]["i"]][cellsId[id]["j"]] =  src==="" ? "" : src.split("")[0];
+    });
+    let nextMove = testGame.select_move(cells);
+    const nextDiv = component.getByTestId(`div-${nextMove["i"]}-${nextMove["j"]}`);
+    fireEvent.click(nextDiv);
+    await new Promise((r) => setTimeout(r, 2000-(250*i)));
+  }
+  expect(component.getByText("draw")).toBeInTheDocument();
+}, 20000);

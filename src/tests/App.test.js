@@ -2,7 +2,7 @@ import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import { render, fireEvent, prettyDOM } from '@testing-library/react';
 import App from '../components/App';
-import TestGame from './../classes/TestGame';
+import game from './../classes/Game';
 const cellsId= {
   "img-0-0": {"i": 0, "j": 0},
   "img-0-1": {"i": 0, "j": 1},
@@ -164,73 +164,8 @@ test('check there are two images with  scr=x.svg after user chooses o symbol, ga
   const x_images = component.container.querySelectorAll('img[src="x.svg"]');
   expect(x_images.length).toBe(2);
 }, 10000);
-// test('user play with default configuration and it clicks the four cells that are not corners neither the center, after that computer should have won', async () => {
-//   const component = render(<App />);
-//   const button = component.getByText(/start/i);
-//   fireEvent.click(button);
-//   const items =["div-0-1","div-1-0","div-1-2","div-2-1"]
-//   for(let i=0; i<4; i++){
-//     const cell = component.getByTestId(items[i]);
-//     fireEvent.click(cell);
-//     await new Promise((r) => setTimeout(r, 2000 - (i*500)));
-//   }
-//   expect(component.getByText("computer wins")).toBeInTheDocument();
-// }, 10000);
-test('user play with o symbol and it clicks the four cells that are not corners neither the center, after that computer should have won', async () => {
-  const component = render(<App />);
-  const button = component.getByText(/start/i);
-  const symbol = component.getByTestId("radio-o");
-  fireEvent.click(symbol);
-  fireEvent.click(button);
-  await new Promise((r) => setTimeout(r, 2000));
-  const items =["div-0-1","div-1-0","div-1-2","div-2-1"]
-  for(let i=0; i<4; i++){
-    const cell = component.getByTestId(items[i]);
-    fireEvent.click(cell);
-    await new Promise((r) => setTimeout(r,2000 - (i*250)));
-  }
-  expect(component.getByText("computer wins")).toBeInTheDocument();
-}, 10000);
-// test('user play with default configuration and it plays in a way computer wins, this tests check the boards shows one of the possible solutions', async () => {
-//   const component = render(<App />);
-//   const button = component.getByText(/start/i);
-//   fireEvent.click(button);
-//   const items =["div-0-1","div-1-0","div-1-2","div-2-1"]
-//   for(let i=0; i<4; i++){
-//     const cell = component.getByTestId(items[i]);
-//     fireEvent.click(cell);
-//     await new Promise((r) => setTimeout(r, 2000 - (i*500)));
-//   };
-//   const solutions=["o_diagonal1","o_diagonal2","o_row","o_column"].map(image_name=>{
-//     const images = component.container.querySelectorAll(`img[src="${image_name}.svg"]`);
-//     console.log(`length: ${images.length}`);
-//     if(images.length===3) return check_valid_solution(images, image_name);
-//     return false;
-//   });
-//   expect(solutions.some(any=>any)).toBe(true);
-// }, 10000);
-test('user select o symbol to play and it plays in a way computer wins, this tests check the boards shows one of the possible solutions', async () => {
-  const component = render(<App />);
-  const button = component.getByText(/start/i);
-  const symbol = component.getByTestId("radio-o");
-  fireEvent.click(symbol);
-  fireEvent.click(button);
-  await new Promise((r) => setTimeout(r, 2000));
-  const items =["div-0-1","div-1-0","div-1-2","div-2-1"]
-  for(let i=0; i<4; i++){
-    const cell = component.getByTestId(items[i]);
-    fireEvent.click(cell);
-    await new Promise((r) => setTimeout(r, 2000 - (i*500)));
-  };
-  const solutions=["x_diagonal1","x_diagonal2","x_row","x_column"].map(image_name=>{
-    const images = component.container.querySelectorAll(`img[src="${image_name}.svg"]`);
-    if(images.length===3) return check_valid_solution(images, image_name);
-    return false;
-  });
-  expect(solutions.some(any=>any)).toBe(true);
-}, 10000)
 test('using default config, show "draw" message after both players do perfect moves', async () => {
-  const testGame = new TestGame("x", "o");
+  const testGame = new game("x", "o");
   const component = render(<App />);
   const button = component.getByText(/start/i);
   fireEvent.click(button);
@@ -251,7 +186,7 @@ test('using default config, show "draw" message after both players do perfect mo
   expect(component.getByText("draw")).toBeInTheDocument();
 }, 20000);
 test('when human plays with o symbol, show "draw" message after both players do perfect moves', async () => {
-  const testGame = new TestGame("o", "x");
+  const testGame = new game("o", "x");
   const component = render(<App />);
   const button = component.getByText(/start/i);
   const symbol = component.getByTestId("radio-o");
@@ -272,4 +207,160 @@ test('when human plays with o symbol, show "draw" message after both players do 
     await new Promise((r) => setTimeout(r, 2000-(250*i)));
   }
   expect(component.getByText("draw")).toBeInTheDocument();
+}, 20000);
+test('using default config, show "draw" message after both players do perfect moves', async () => {
+  const testGame = new game("x", "o");
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 2000));
+  const cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<5; i++){
+    const images = component.container.querySelectorAll(`img`);
+    images.forEach(image=>{
+      const id = image.getAttribute('data-testid');
+      let src = image.getAttribute('src');
+      cells[cellsId[id]["i"]][cellsId[id]["j"]] =  src==="" ? "" : src.split("")[0];
+    });
+    let nextMove = testGame.select_move(cells);
+    const nextDiv = component.getByTestId(`div-${nextMove["i"]}-${nextMove["j"]}`);
+    fireEvent.click(nextDiv);
+    await new Promise((r) => setTimeout(r, 2000-(250*i)));
+  }
+  const solutions=["x_diagonal1","x_diagonal2","x_row","x_column","o_diagonal1","o_diagonal2","o_row","o_column"].map(image_name=>{
+    const images = component.container.querySelectorAll(`img[src="${image_name}.svg"]`);
+    if(images.length>0) return true;
+    return false;
+  });
+  expect(solutions.some(any=>any)).toBe(false);
+}, 20000);
+test('when human plays with o symbol, show "draw" message after both players do perfect moves', async () => {
+  const testGame = new game("o", "x");
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  const symbol = component.getByTestId("radio-o");
+  fireEvent.click(symbol);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 2000));
+  const cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<4; i++){
+    const images = component.container.querySelectorAll(`img`);
+    images.forEach(image=>{
+      const id = image.getAttribute('data-testid');
+      let src = image.getAttribute('src');
+      cells[cellsId[id]["i"]][cellsId[id]["j"]] =  src==="" ? "" : src.split("")[0];
+    });
+    let nextMove = testGame.select_move(cells);
+    const nextDiv = component.getByTestId(`div-${nextMove["i"]}-${nextMove["j"]}`);
+    fireEvent.click(nextDiv);
+    await new Promise((r) => setTimeout(r, 2000-(250*i)));
+  }
+  const solutions=["x_diagonal1","x_diagonal2","x_row","x_column","o_diagonal1","o_diagonal2","o_row","o_column"].map(image_name=>{
+    const images = component.container.querySelectorAll(`img[src="${image_name}.svg"]`);
+    if(images.length>0) return true;
+    return false;
+  });
+  expect(solutions.some(any=>any)).toBe(false);
+}, 20000);
+test('using default config, show "computer wins" message human player make the worst choices', async () => {
+  const testGame = new game("x", "o");
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 2000));
+  const cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<5; i++){
+    const images = component.container.querySelectorAll(`img`);
+    images.forEach(image=>{
+      const id = image.getAttribute('data-testid');
+      let src = image.getAttribute('src');
+      cells[cellsId[id]["i"]][cellsId[id]["j"]] =  src==="" ? "" : src.split("")[0];
+    });
+    if(testGame.any_winner(cells)) break;
+    let nextMove = testGame.select_move(cells, true);
+    const nextDiv = component.getByTestId(`div-${nextMove["i"]}-${nextMove["j"]}`);
+    fireEvent.click(nextDiv);
+    await new Promise((r) => setTimeout(r, 2000-(250*i)));
+  }
+  expect(component.getByText("computer wins")).toBeInTheDocument();
+}, 20000);
+test('when human plays with o symbol, show "computer wins" message human player make the worst choices', async () => {
+  const testGame = new game("o", "x");
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  const symbol = component.getByTestId("radio-o");
+  fireEvent.click(symbol);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 2000));
+  const cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<4; i++){
+    const images = component.container.querySelectorAll(`img`);
+    images.forEach(image=>{
+      const id = image.getAttribute('data-testid');
+      let src = image.getAttribute('src');
+      cells[cellsId[id]["i"]][cellsId[id]["j"]] =  src==="" ? "" : src.split("")[0];
+    });
+    if(testGame.any_winner(cells)) break;
+    let nextMove = testGame.select_move(cells, true);
+    const nextDiv = component.getByTestId(`div-${nextMove["i"]}-${nextMove["j"]}`);
+    fireEvent.click(nextDiv);
+    await new Promise((r) => setTimeout(r, 2000-(250*i)));
+  }
+  expect(component.getByText("computer wins")).toBeInTheDocument();
+}, 20000);
+test('using default config, find a valid winner solution when human plays the worst choices', async () => {
+  const testGame = new game("x", "o");
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 2000));
+  const cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<5; i++){
+    const images = component.container.querySelectorAll(`img`);
+    images.forEach(image=>{
+      const id = image.getAttribute('data-testid');
+      let src = image.getAttribute('src');
+      cells[cellsId[id]["i"]][cellsId[id]["j"]] =  src==="" ? "" : src.split("")[0];
+    });
+    if(testGame.any_winner(cells)) break;
+    let nextMove = testGame.select_move(cells, true);
+    const nextDiv = component.getByTestId(`div-${nextMove["i"]}-${nextMove["j"]}`);
+    fireEvent.click(nextDiv);
+    await new Promise((r) => setTimeout(r, 2000-(250*i)));
+  }
+    const solutions=["o_diagonal1","o_diagonal2","o_row","o_column"].map(image_name=>{
+    const images = component.container.querySelectorAll(`img[src="${image_name}.svg"]`);
+    if(images.length===3) return check_valid_solution(images, image_name);
+    return false;
+  });
+  expect(solutions.some(any=>any)).toBe(true);
+}, 20000);
+test('when human plays with o symbol, find a valid winner solution when human plays the worst choices', async () => {
+  const testGame = new game("o", "x");
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  const symbol = component.getByTestId("radio-o");
+  fireEvent.click(symbol);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 2000));
+  const cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<4; i++){
+    const images = component.container.querySelectorAll(`img`);
+    images.forEach(image=>{
+      const id = image.getAttribute('data-testid');
+      let src = image.getAttribute('src');
+      cells[cellsId[id]["i"]][cellsId[id]["j"]] =  src==="" ? "" : src.split("")[0];
+    });
+    if(testGame.any_winner(cells)) break;
+    let nextMove = testGame.select_move(cells, true);
+    const nextDiv = component.getByTestId(`div-${nextMove["i"]}-${nextMove["j"]}`);
+    fireEvent.click(nextDiv);
+    await new Promise((r) => setTimeout(r, 2000-(250*i)));
+  }
+    const solutions=["x_diagonal1","x_diagonal2","x_row","x_column"].map(image_name=>{
+    const images = component.container.querySelectorAll(`img[src="${image_name}.svg"]`);
+    if(images.length===3) return check_valid_solution(images, image_name);
+    return false;
+  });
+  expect(solutions.some(any=>any)).toBe(true);
 }, 20000);

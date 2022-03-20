@@ -12,9 +12,9 @@ class Game{
     {"coords": [[0,2],[1,1],[2,0]], "x": "x_diagonal2", "o": "o_diagonal2"}]
   }
 
-  select_move = (cells)=>{
+  select_move = (cells, play_poorly=false)=>{
     let available_cells=this.available_moves(cells);
-    let selected_move = this.best_position(cells, available_cells.length);
+    let selected_move = this.best_position(cells, available_cells.length, play_poorly);
     return {...selected_move, ...{"available_cells": available_cells.length}};
   }
 
@@ -64,34 +64,41 @@ class Game{
     return false;
   }
   // maxPlayer is always computer player
-  minimax = (position, depth, maxPlayer)=>{
+  minimax = (position, depth, maxPlayer, play_poorly)=>{
     const winner = this.any_winner(position);
     if(winner && maxPlayer) return -100-depth;
     if(winner && !maxPlayer) return 100+depth;
     if(depth===0) return 0;
     const available_moves = this.available_moves(position);
-    let best_score=maxPlayer ? -200 : 200;
+    let best_score= play_poorly ? 200 : (maxPlayer ? -200 : 200);
     available_moves.forEach((move)=>{
       const new_pos = this.positionAfterMove(position, move, maxPlayer ? this.computerSymbol : this.humanSymbol);
       const new_score =this.minimax(new_pos, depth-1, !maxPlayer);
-      if(maxPlayer && best_score<new_score) best_score=new_score;
-      else if(!maxPlayer && best_score>new_score) best_score=new_score;
+      if(play_poorly){
+        if(best_score>new_score) best_score=new_score;
+      }
+      else{
+        if(maxPlayer && best_score<new_score) best_score=new_score;
+        else if(!maxPlayer && best_score>new_score) best_score=new_score;
+      }
     });
     return best_score;
   }
 
-  best_position = (position, depth)=>{
+  best_position = (position, depth, play_poorly)=>{
     const available_moves = this.available_moves(position);
-    let best_score = -200;
+    let best_score = play_poorly ? 200 : -200;
     let best_moves = [];
     available_moves.forEach((move)=>{
       const new_pos = this.positionAfterMove(position, move, this.computerSymbol);
-      const new_score =this.minimax(new_pos, depth-1, false);
-      if(best_score<new_score){
+      const new_score =this.minimax(new_pos, depth-1, false, play_poorly);
+      if(best_score===new_score){
+        best_moves.push(move);
+      }
+      else if((play_poorly && best_score>new_score) || (!play_poorly && best_score<new_score)){
         best_score=new_score;
         best_moves = [move];
       }
-      else if(best_score===new_score) best_moves.push(move);
     });
     return best_moves[Math.floor(Math.random()*best_moves.length)];
   }
@@ -124,5 +131,4 @@ class Game{
     }
   }
 }
-
 export default Game;

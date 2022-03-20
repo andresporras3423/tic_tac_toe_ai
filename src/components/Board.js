@@ -36,6 +36,12 @@ class Board extends React.Component {
       humanSymbol: "x",
       computerSymbol: "o",
       symbolToPlay: "",
+      level: "hard",
+      updateLevel: async ()=>{
+        await this.setState({
+          level: this.state.level==="hard" ? "easy" : "hard" 
+       });
+      },
       cloneDeep: (_cells)=>{
         let newCells=[]
         _cells.forEach(rows=>{
@@ -82,7 +88,7 @@ class Board extends React.Component {
        }
      },
      computerPlay: async ()=>{
-      let computerMove= this.state.game.select_move(this.state.cells);
+      let computerMove= this.state.game.select_move(this.state.cells, this.state.level==="easy");
       if(computerMove["available_cells"]===0){
         await this.setState({
           gameStatus: "draw"
@@ -122,7 +128,7 @@ class Board extends React.Component {
        })
        await this.state.clearBoard();
        if(this.state.humanSymbol==="o"){
-        let computerMove= this.state.game.select_move(this.state.cells);
+        let computerMove= this.state.game.select_move(this.state.cells, this.state.level==="easy");
         await this.state.updateCells(computerMove['i'],computerMove['j'],this.state.computerSymbol);
        }
        await this.setState({
@@ -149,6 +155,18 @@ class Board extends React.Component {
             checked={this.state.humanSymbol === "o"}
             onChange={this.state.updatehumanSymbol}  /> 
             <label className="form-check-label">Play with O</label>
+            </div>
+            <div>
+            <input data-testid="radio-easy" type="radio" value="easy" name="level" className="form-check-input"
+            checked={this.state.level === "easy"}
+              onChange={this.state.updateLevel} /> 
+              <label className="form-check-label">easy</label>
+            </div>
+            <div>
+            <input data-testid="radio-hard" type="radio" value="hard" name="level" className="form-check-input"
+            checked={this.state.level === "hard"}
+            onChange={this.state.updateLevel}  /> 
+            <label className="form-check-label">hard</label>
             </div>
           </div>
           <div>

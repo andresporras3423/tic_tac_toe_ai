@@ -2,6 +2,19 @@ body{
   background-color: rgb(235,235,235);
 }
 
+.form-check {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.form-check > * {
+  margin-left: 10px;
+  margin-right: 10px;
+  display: grid;
+  justify-content: center;
+  align-items: center;
+}
+
 .App {
   text-align: center;
   display: flex;
@@ -41,6 +54,18 @@ body{
   cursor: pointer;
 }
 
+.show-if-mobile{
+  display: none;
+}
+
+.not-show-if-mobile{
+  display: block;
+}
+
+.card-body-content{
+  margin: 5px;
+}
+
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
@@ -69,5 +94,26 @@ body{
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media only screen and (max-width: 450px) {
+  .form-check {
+    grid-template-columns: 1fr;
+  }
+
+  .form-check > * {
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .show-if-mobile{
+    display:block;
+  }
+
+  .not-show-if-mobile{
+    display: none;
   }
 }

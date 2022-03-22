@@ -1,8 +1,9 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import { render, fireEvent, prettyDOM } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import App from '../components/App';
 import game from './../classes/Game';
+
 const cellsId= {
   "img-0-0": {"i": 0, "j": 0},
   "img-0-1": {"i": 0, "j": 1},
@@ -48,6 +49,42 @@ test('check if page has text "play with X"', () => {
 test('check if page has text "play with O"', () => {
   const component = render(<App />);
   expect(component.getByText("Play with O")).toBeInTheDocument();
+});
+test('check if page has text "Choose symbol"', () => {
+  const component = render(<App />);
+  expect(component.getByTestId("a-symbol-screen").textContent).toMatch(/Choose symbol/i);
+});
+test('check that element with data-testid mobile-symbols is not in the document', () => {
+  const component = render(<App />);
+  expect(component.queryByTestId("mobile-symbols")).toBeNull();
+});
+test('check that element with data-testid mobile-levels is not in the document', () => {
+  const component = render(<App />);
+  expect(component.queryByTestId("mobile-levels")).toBeNull();
+});
+test('check that element with data-testid screen-symbols is in the document', () => {
+  const component = render(<App />);
+  expect(component.queryByTestId("screen-symbols")).not.toBeNull();
+});
+test('check that element with data-testid screen-levels is in the document', () => {
+  const component = render(<App />);
+  expect(component.queryByTestId("screen-levels")).not.toBeNull();
+});
+test('when default screen check if element with data-testid a-symbol-mobile has display=none style', () => {
+  const component = render(<App />);
+  expect(component.getByTestId("a-symbol-screen")).toBeVisible();
+});
+test('check if page has text "Choose level"', () => {
+  const component = render(<App />)
+  expect(component.getByTestId("a-level-screen").textContent).toMatch(/Choose level/i);
+});
+test('check if page has text "easy"', () => {
+  const component = render(<App />);
+  expect(component.getByText("easy")).toBeInTheDocument();
+});
+test('check if page has text "hard"', () => {
+  const component = render(<App />);
+  expect(component.getByText("hard")).toBeInTheDocument();
 });
 test('test radio button to start with x is checked', () => {
   const component = render(<App />);
@@ -363,4 +400,114 @@ test('when human plays with o symbol, find a valid winner solution when human pl
     return false;
   });
   expect(solutions.some(any=>any)).toBe(true);
+}, 20000);
+test('when human plays on easy level, wins if makes perfect moves', async () => {
+  const testGame = new game("o", "x");
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  const easy = component.getByTestId("radio-easy");
+  fireEvent.click(easy);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 2000));
+  const cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<5; i++){
+    const images = component.container.querySelectorAll(`img`);
+    images.forEach(image=>{
+      const id = image.getAttribute('data-testid');
+      let src = image.getAttribute('src');
+      cells[cellsId[id]["i"]][cellsId[id]["j"]] =  src==="" ? "" : src.split("")[0];
+    });
+    if(testGame.any_winner(cells)) break;
+    let nextMove = testGame.select_move(cells, false);
+    const nextDiv = component.getByTestId(`div-${nextMove["i"]}-${nextMove["j"]}`);
+    fireEvent.click(nextDiv);
+    await new Promise((r) => setTimeout(r, 2000-(250*i)));
+  }
+    const solutions=["x_diagonal1","x_diagonal2","x_row","x_column"].map(image_name=>{
+    const images = component.container.querySelectorAll(`img[src="${image_name}.svg"]`);
+    if(images.length===3) return check_valid_solution(images, image_name);
+    return false;
+  });
+  expect(solutions.some(any=>any)).toBe(true);
+}, 20000);
+test('when human plays on easy level and o symbol, wins if makes perfect moves', async () => {
+  const testGame = new game("o", "x");
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  const easy = component.getByTestId("radio-easy");
+  const symbol = component.getByTestId("radio-o");
+  fireEvent.click(symbol);
+  fireEvent.click(easy);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 2000));
+  const cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<4; i++){
+    const images = component.container.querySelectorAll(`img`);
+    images.forEach(image=>{
+      const id = image.getAttribute('data-testid');
+      let src = image.getAttribute('src');
+      cells[cellsId[id]["i"]][cellsId[id]["j"]] =  src==="" ? "" : src.split("")[0];
+    });
+    if(testGame.any_winner(cells)) break;
+    let nextMove = testGame.select_move(cells, false);
+    const nextDiv = component.getByTestId(`div-${nextMove["i"]}-${nextMove["j"]}`);
+    fireEvent.click(nextDiv);
+    await new Promise((r) => setTimeout(r, 2000-(250*i)));
+  }
+    const solutions=["o_diagonal1","o_diagonal2","o_row","o_column"].map(image_name=>{
+    const images = component.container.querySelectorAll(`img[src="${image_name}.svg"]`);
+    if(images.length===3) return check_valid_solution(images, image_name);
+    return false;
+  });
+  expect(solutions.some(any=>any)).toBe(true);
+}, 20000);
+test('when human plays on easy level, show "you win" message if makes the best moves', async () => {
+  const testGame = new game("o", "x");
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  const easy = component.getByTestId("radio-easy");
+  fireEvent.click(easy);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 2000));
+  const cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<5; i++){
+    const images = component.container.querySelectorAll(`img`);
+    images.forEach(image=>{
+      const id = image.getAttribute('data-testid');
+      let src = image.getAttribute('src');
+      cells[cellsId[id]["i"]][cellsId[id]["j"]] =  src==="" ? "" : src.split("")[0];
+    });
+    if(testGame.any_winner(cells)) break;
+    let nextMove = testGame.select_move(cells, false);
+    const nextDiv = component.getByTestId(`div-${nextMove["i"]}-${nextMove["j"]}`);
+    fireEvent.click(nextDiv);
+    await new Promise((r) => setTimeout(r, 2000-(250*i)));
+  }
+  expect(component.getByText("you win")).toBeInTheDocument();
+}, 20000);
+test('when human plays on easy level and o symbol, show "you win" message if plays perfect moves', async () => {
+  const testGame = new game("o", "x");
+  const component = render(<App />);
+  const button = component.getByText(/start/i);
+  const easy = component.getByTestId("radio-easy");
+  const symbol = component.getByTestId("radio-o");
+  fireEvent.click(symbol);
+  fireEvent.click(easy);
+  fireEvent.click(button);
+  await new Promise((r) => setTimeout(r, 2000));
+  const cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<4; i++){
+    const images = component.container.querySelectorAll(`img`);
+    images.forEach(image=>{
+      const id = image.getAttribute('data-testid');
+      let src = image.getAttribute('src');
+      cells[cellsId[id]["i"]][cellsId[id]["j"]] =  src==="" ? "" : src.split("")[0];
+    });
+    if(testGame.any_winner(cells)) break;
+    let nextMove = testGame.select_move(cells, false);
+    const nextDiv = component.getByTestId(`div-${nextMove["i"]}-${nextMove["j"]}`);
+    fireEvent.click(nextDiv);
+    await new Promise((r) => setTimeout(r, 2000-(250*i)));
+  }
+  expect(component.getByText("you win")).toBeInTheDocument();
 }, 20000);

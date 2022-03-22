@@ -193,8 +193,9 @@ class Board extends React.Component {
         <div className="form-check">
           <div className="card">
             <div className="card-body-content">
-              <h5 className="card-title not-show-if-mobile"> Choose symbol</h5>
+              <h5 data-testid="a-symbol-screen" className="card-title not-show-if-mobile"> Choose symbol</h5>
               <a
+                data-testid="a-symbol-mobile"
                 className="card-title show-if-mobile"
                 href=""
                 onClick={(e) => this.state.toggleSymbols(e)}
@@ -202,7 +203,7 @@ class Board extends React.Component {
                 {" "}
                 Choose symbol
               </a>
-              <div className="not-show-if-mobile">
+              <div data-testid="screen-symbols"  className="not-show-if-mobile">
                 <div>
                   <input
                     data-testid="radio-x"
@@ -231,7 +232,7 @@ class Board extends React.Component {
               {(() => {
                 if (this.state.showSymbols) {
                   return (
-                    <div className="show-if-mobile">
+                    <div data-testid="mobile-symbols" className="show-if-mobile">
                       <div>
                         <input
                           data-testid="radio-x"
@@ -265,8 +266,9 @@ class Board extends React.Component {
           </div>
           <div className="card">
             <div className="card-body-content">
-              <h5 className="card-title not-show-if-mobile"> Choose level</h5>
+              <h5 data-testid="a-level-screen" className="card-title not-show-if-mobile"> Choose level</h5>
               <a
+                data-testid="a-level-mobile"
                 className="card-title show-if-mobile"
                 href=""
                 onClick={(e) => this.state.toggleLevel(e)}
@@ -274,7 +276,7 @@ class Board extends React.Component {
                 {" "}
                 Choose level
               </a>
-              <div className="not-show-if-mobile">
+              <div data-testid="screen-levels" className="not-show-if-mobile">
                 <div>
                   <input
                     data-testid="radio-easy"
@@ -303,7 +305,7 @@ class Board extends React.Component {
               {(() => {
                 if (this.state.showLevels) {
                   return (
-                    <div className="show-if-mobile">
+                    <div data-testid="mobile-levels" className="show-if-mobile">
                       <div>
                         <input
                           data-testid="radio-easy"

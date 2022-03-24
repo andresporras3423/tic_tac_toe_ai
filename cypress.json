@@ -1,3 +1,4 @@
 {
-  "watchForFileChanges": false
+  "watchForFileChanges": false,
+  "defaultCommandTimeout": 5000
 }

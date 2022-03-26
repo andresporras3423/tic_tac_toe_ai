@@ -1,5 +1,5 @@
 import promisify from 'cypress-promise'
-import game from './../../src/classes/Game';
+import game from '../../src/classes/Game';
 /// <reference types="cypress" />
 
 const get_all_img_src =  async()=>{
@@ -99,4 +99,76 @@ it("playing with o symbol, if human plays perfect moves it draws", async ()=>{
     cy.get(`[data-testid="div-${nextMove["i"]}-${nextMove["j"]}"]`).click();
   }
   cy.get('h1').contains('draw');
+})
+
+it("with default config, if human plays worst moves computer wins", async ()=>{
+  cy.visit("http://localhost:3000/")
+  cy.viewport(414, 736)
+  cy.get('[data-testid="button-start"]').click()
+  const testGame = new game("x", "o");
+  let cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<5; i++){
+    cells = await get_all_img_src();
+    let nextMove = testGame.select_move(cells, true);
+    cy.get(`[data-testid="div-${nextMove["i"]}-${nextMove["j"]}"]`).click();
+    const status = await promisify(cy.get('h1'));
+    if(status.text()!=="playing") break;
+  }
+  cy.get('h1').contains('computer wins');
+})
+
+it("playing with o symbol, if human plays worst moves computer wins", async ()=>{
+  cy.visit("http://localhost:3000/")
+  cy.viewport(414, 736)
+  cy.get('[data-testid="a-symbol-mobile"]').click()
+  cy.get('[data-testid="mobile-symbols"] > :nth-child(2) > [data-testid="radio-o"]').click()
+  cy.get('[data-testid="button-start"]').click()
+  const testGame = new game("o", "x");
+  let cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<4; i++){
+    cells = await get_all_img_src();
+    let nextMove = testGame.select_move(cells, true);
+    cy.get(`[data-testid="div-${nextMove["i"]}-${nextMove["j"]}"]`).click();
+    const status = await promisify(cy.get('h1'));
+    if(status.text()!=="playing") break;
+  }
+  cy.get('h1').contains('computer wins');
+})
+
+it("playing easy level, if human plays perfect moves it win", async ()=>{
+  cy.visit("http://localhost:3000/")
+  cy.viewport(414, 736)
+  cy.get('[data-testid="a-level-mobile"]').click()
+  cy.get('[data-testid="mobile-levels"] > :nth-child(1) > [data-testid="radio-easy"]').click()
+  cy.get('[data-testid="button-start"]').click()
+  const testGame = new game("x", "o");
+  let cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<5; i++){
+    cells = await get_all_img_src();
+    let nextMove = testGame.select_move(cells);
+    cy.get(`[data-testid="div-${nextMove["i"]}-${nextMove["j"]}"]`).click();
+    const status = await promisify(cy.get('h1'));
+    if(status.text()!=="playing") break;
+  }
+  cy.get('h1').contains('you win');
+})
+
+it("playing with o symbol and easy level, if human plays perfect moves it win", async ()=>{
+  cy.visit("http://localhost:3000/")
+  cy.viewport(414, 736)
+  cy.get('[data-testid="a-level-mobile"]').click()
+  cy.get('[data-testid="mobile-levels"] > :nth-child(1) > [data-testid="radio-easy"]').click()
+  cy.get('[data-testid="a-symbol-mobile"]').click()
+  cy.get('[data-testid="mobile-symbols"] > :nth-child(2) > [data-testid="radio-o"]').click()
+  cy.get('[data-testid="button-start"]').click()
+  const testGame = new game("o", "x");
+  let cells = [["","",""],["","",""],["","",""]];
+  for(let i=0; i<4; i++){
+    cells = await get_all_img_src();
+    let nextMove = testGame.select_move(cells);
+    cy.get(`[data-testid="div-${nextMove["i"]}-${nextMove["j"]}"]`).click();
+    const status = await promisify(cy.get('h1'));
+    if(status.text()!=="playing") break;
+  }
+  cy.get('h1').contains('you win');
 })
